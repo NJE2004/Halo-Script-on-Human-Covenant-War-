@@ -1,5 +1,10 @@
 // ===== context.js =====
-const context = async () => {
+
+// Checkout the Guidebook examples to get an idea of other ways you can use scripting
+// https://help.aidungeon.com/scripting
+
+// Every script needs a modifier function
+const modifier = (text) => {
   const profile = state.plotEssentials?.profile || {};
   const warYear = state.plotEssentials?.warYear || 2525;
   const turns = state.plotEssentials?.turns || 0;
@@ -10,9 +15,11 @@ const context = async () => {
   const colony = profile.colony || "Unknown";
   const reputation = profile.reputation || {};
   const deployed = profile.deployed || false;
-  const inventory = (state.inventory || []).join(", ") || "None";
+  const inventory = (state.inventory && Object.keys(state.inventory).length > 0)
+    ? Object.entries(state.inventory).map(([item, qty]) => `${item} x${qty}`).join(", ")
+    : "None";
 
-  return `
+  state.memory.context = `
 The year is ${warYear}. The Human-Covenant War rages across the galaxy.
 Date: ${currentDate}
 
@@ -27,6 +34,6 @@ You are ${(turns * 0.5).toFixed(1)} hours into the war (1 turn = 30 minutes).
 The situation dynamically changes as the war escalates each year.
 Make decisions wisely; every action affects the galaxy.
   `.trim();
-};
 
-context();
+  return { text };
+};
